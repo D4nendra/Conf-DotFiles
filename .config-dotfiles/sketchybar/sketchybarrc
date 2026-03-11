@@ -4,6 +4,9 @@ PINK=0xFFD7448A
 RED=0xFFCE3A5B
 GREEN=0xFF638989
 
+# Add custom event for AeroSpace workspace tracking
+sketchybar --add event aerospace_workspace_change
+
 # main bar & defaults
 sketchybar --bar height=54        \
                  margin=12        \
@@ -36,7 +39,7 @@ do
                               icon.align=center \
                               icon.width=30 \
                               label.drawing=off \
-                              click_script="yabai -m space --focus $sid"
+                              click_script="aerospace workspace $sid"
 done
 
 # create new space button
@@ -55,7 +58,7 @@ sketchybar --add bracket spaces '/space\..*/' new_space                \
                                 background.border_width=1              \
                                 background.border_color=$PINK          \
                                 blur_radius=2                          \
-                                background.height=30                    
+                                background.height=30                   
 
 # add space highlighter dot
 sketchybar --add item highlight_space left                      \
@@ -65,7 +68,8 @@ sketchybar --add item highlight_space left                      \
                                       background.corner_radius=11 \
                                       script='./scripts/highlight_space.sh'
 
-sketchybar --subscribe highlight_space space_change
+# Subscribe to the new AeroSpace event
+sketchybar --subscribe highlight_space aerospace_workspace_change
 
 # overlay numbers above space highlighter dot
 for i in "${!SPACE_ICONS[@]}"
@@ -79,7 +83,7 @@ do
                               icon.align=center \
                               icon.width=30 \
                               label.drawing=off \
-                              click_script="yabai -m space --focus $sid" 
+                              click_script="aerospace workspace $sid" 
 done
 
 sketchybar --set space_ex.1 padding_left=-999999
@@ -111,11 +115,9 @@ sketchybar --add item title center                                  \
                             script='./scripts/title.sh'             \
                             background.border_color=0xFFD3CDC5      \
                             update_freq=1                           \
-                            label.max_chars=54                      # \
-                            # scroll_texts=on                         \
-                            # label.scroll_duration=200
+                            label.max_chars=54                      
 
-sketchybar --subscribe title title_change
+sketchybar --subscribe title title_change front_app_switched
 
 
 # ~~ right items ~~
@@ -165,3 +167,6 @@ sketchybar --add item title_proxy right                             \
 # finish config
 sketchybar --hotload on
 sketchybar --update
+
+# Force an initial run of the script to hide empty workspaces on load
+./scripts/highlight_space.sh
